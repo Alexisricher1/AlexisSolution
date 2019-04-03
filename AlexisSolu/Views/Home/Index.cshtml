@@ -1,0 +1,116 @@
+﻿@using AlexisSolu.Controllers
+@model MatrixModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div id="vueme">
+    <div id="multip-table">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th class="text-center" scope="col">X</th>
+                    @for (var i = 1; i <= Model.Size; i++)
+                    {
+                        <th class="text-center bg-info">@i</th>
+                    } 
+                </tr>
+            </thead>
+            <tbody>
+            @for (var i = 1; i <= Model.Size; i++)
+            {
+                <tr>
+                    <th class="text-center bg-info" scope="row">@i</th>
+                    @for (var j = 1; j <= Model.Size; j++)
+                    {
+                        var output = string.Empty;
+                        var indexI = i.ToString();
+                        var indexJ = j.ToString();
+                        switch (Model.Base)
+                        {
+                            case MatrixModel.MatrixModelBase.Decimal :
+                                output = (i * j).ToString();
+                                break;
+                            case MatrixModel.MatrixModelBase.Binary :
+                                indexI = Convert.ToString(i, 2);
+                                indexJ = Convert.ToString(j, 2);
+                                output = Convert.ToString(i * j, 2);
+                                break;
+                            case MatrixModel.MatrixModelBase.Hexadecimal :
+                                indexI = i.ToString("X");
+                                indexJ = j.ToString("X");
+                                output = (i * j).ToString("X");
+                                break;
+                        }
+
+                        var isPrimeNumber = false;
+                        if (i * j >= 2)
+                        {
+                            isPrimeNumber = true;
+                            var m = (i * j) / 2;
+                            for(var k = 2; k <= m; k++)
+                            {
+                                if((i * j) % k == 0)
+                                {
+                                    isPrimeNumber = false;
+                                    break;
+                                }
+                            }
+                        }
+                        <td title="@($"{indexI} X {indexJ} = {output}")" class="text-center @((i != j) ? string.Empty : "bg-primary") @(isPrimeNumber ? "bg-danger" : string.Empty)">@output</td>
+                    }
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    <input type="number" min="@HomeController.MIN_MATRIX_VALUE" max="@HomeController.MAX_MATRIX_VALUE" v-model="matrix.size" />
+    <div id="sizeAlert" class="alert alert-danger" role="alert" style="display: none;">
+        Matrix size should be between @HomeController.MIN_MATRIX_VALUE and @HomeController.MAX_MATRIX_VALUE.
+    </div>
+    <button type="button" v-on:click="generateMatrix" class="btn btn-success">Generate</button>
+    <br/>
+    <br/>
+    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+        <label v-on:click="changeMatrixBase(@((int)MatrixModel.MatrixModelBase.Decimal))"  class="btn btn-primary @(Model.Base == MatrixModel.MatrixModelBase.Decimal ? "active" : string.Empty)">
+            <input type="radio" autocomplete="off" @(Model.Base == MatrixModel.MatrixModelBase.Decimal ? "checked" : string.Empty)> Decimal
+        </label>
+        <label v-on:click="changeMatrixBase(@((int)MatrixModel.MatrixModelBase.Binary))" class="btn btn-primary @(Model.Base == MatrixModel.MatrixModelBase.Binary ? "active" : string.Empty)">
+            <input type="radio" autocomplete="off" @(Model.Base == MatrixModel.MatrixModelBase.Binary ? "checked" : string.Empty)> Binary
+        </label>
+        <label v-on:click="changeMatrixBase(@((int)MatrixModel.MatrixModelBase.Hexadecimal))" class="btn btn-primary @(Model.Base == MatrixModel.MatrixModelBase.Hexadecimal ? "active" : string.Empty)">
+            <input type="radio" autocomplete="off" @(Model.Base == MatrixModel.MatrixModelBase.Hexadecimal ? "checked" : string.Empty)> Hexadecimal
+        </label>
+    </div>
+</div>
+
+<script>
+    var vm = new Vue({
+        el: '#vueme',
+        data: {
+            matrix: @Json.Serialize(Model)
+        },
+        methods: {
+            generateMatrix: function () {
+                if (this.isValidMatrix()) {
+                    $('#sizeAlert').hide();
+                    window.location.href = 
+                        '@Url.Action("GenerateNewMatrix", "Home")?pSize=' + this.matrix.size +
+                                                                "&pBase=" + this.matrix.base;
+                }
+                else {
+                    $('#sizeAlert').show();
+                }
+            },
+            changeMatrixBase: function(pBase) {
+                this.matrix.base = pBase;
+                this.generateMatrix();
+            },
+            isValidMatrix: function () {
+                var isValidSize = (this.matrix.size >= 3 && this.matrix.size <= 15);
+                var isValidBase = this.matrix.base >= 0 && this.matrix.base <= @(Enum.GetValues(typeof(MatrixModel.MatrixModelBase)).Length - 1);
+                return isValidSize && isValidBase;
+            }
+        }
+    });
+</script>
