@@ -43,14 +43,17 @@
                                 break;
                         }
 
+                        // Prime numbers bg will be set to red
                         var isPrimeNumber = false;
-                        if (i * j >= 2)
+                        var rawDecimalOutput = i * j;
+
+                        if (rawDecimalOutput >= 2)
                         {
                             isPrimeNumber = true;
-                            var m = (i * j) / 2;
-                            for(var k = 2; k <= m; k++)
+                            // Starts at 2
+                            for(var k = 2; k <= rawDecimalOutput / 2; k++)
                             {
-                                if((i * j) % k == 0)
+                                if(rawDecimalOutput % k == 0)
                                 {
                                     isPrimeNumber = false;
                                     break;
@@ -107,7 +110,7 @@
                 this.generateMatrix();
             },
             isValidMatrix: function () {
-                var isValidSize = (this.matrix.size >= 3 && this.matrix.size <= 15);
+                var isValidSize = (this.matrix.size >= @HomeController.MIN_MATRIX_VALUE && this.matrix.size <= @HomeController.MAX_MATRIX_VALUE);
                 var isValidBase = this.matrix.base >= 0 && this.matrix.base <= @(Enum.GetValues(typeof(MatrixModel.MatrixModelBase)).Length - 1);
                 return isValidSize && isValidBase;
             }

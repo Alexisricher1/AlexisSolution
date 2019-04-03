@@ -7,8 +7,8 @@ namespace AlexisSolu.Controllers
     public class HomeController : Controller
     {
         private const MatrixModel.MatrixModelBase DEFAULT_MATRIX_BASE = MatrixModel.MatrixModelBase.Decimal;
+        private const int DEFAULT_MATRIX_VALUE = 10;
 
-        public const int DEFAULT_MATRIX_VALUE = 10;
         public const int MIN_MATRIX_VALUE = 3;
         public const int MAX_MATRIX_VALUE = 15;
 
@@ -21,7 +21,6 @@ namespace AlexisSolu.Controllers
         {
             var newMatrix = new MatrixModel(pSize, pBase);
 
-            // Should probably be using fluent validation
             if (!IsValidMatrixSize(newMatrix))
             {
                 return BadRequest($"Matrix size parameter must be between {MIN_MATRIX_VALUE} and {MAX_MATRIX_VALUE}.");
